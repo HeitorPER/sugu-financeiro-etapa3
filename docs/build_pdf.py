@@ -73,7 +73,7 @@ story.append(hr())
 
 # ---------------------------------- ITEM 1 -------------------------------
 story.append(Paragraph("1. Grupo e integrantes", H2))
-story.append(Paragraph("Grupo nº: <b>____</b> &nbsp;&nbsp;(preencher com o número do grupo)", BODY))
+story.append(Paragraph("Grupo nº: <b>10</b>", BODY))
 integrantes = [
     ["Integrante (ordem alfabética)", "RA"],
     ["Daniel Gidrão", "829511"],
@@ -178,11 +178,11 @@ tech = [
     [P("<b>Python 3.13</b>"), P("Linguagem de acesso ao banco (back-end), conforme exigido pelo exercício.")],
     [P("<b>FastAPI</b>"), P("Framework que expõe as funcionalidades como uma API REST (endpoints /api/...).")],
     [P("<b>Uvicorn</b>"), P("Servidor ASGI que executa a aplicação FastAPI.")],
-    [P("<b>PyMySQL</b>"), P("Driver de conexão Python para MariaDB; executa SQL, procedures e functions.")],
+    [P("<b>psycopg2-binary</b>"), P("Driver de conexão Python para PostgreSQL; executa SQL, procedures e functions.")],
     [P("<b>python-dotenv</b>"), P("Lê as credenciais do banco de um arquivo .env (configuração sem hard-code).")],
     [P("<b>React 18 + Vite</b>"), P("Front-end (SPA) com as telas das funcionalidades; proxy /api para o back-end.")],
-    [P("<b>MariaDB 10.11</b>"), P("SGBD do subsistema (banco sugu_financeiro criado na Etapa 2).")],
-    [P("<b>Docker</b>"), P("Provisiona o container do MariaDB 10.11, garantindo fidelidade ao ambiente da Etapa 2.")],
+    [P("<b>PostgreSQL 14+</b>"), P("SGBD do subsistema (banco sugu_financeiro criado na Etapa 2).")],
+    [P("<b>Docker</b>"), P("Provisiona o container do PostgreSQL 14+, garantindo fidelidade ao ambiente da Etapa 2.")],
     [P("<b>Playwright</b>"), P("Automação do navegador para capturar os prints das telas (Seção 7).")],
 ]
 tt = Table(tech, colWidths=[4.4 * cm, 11.6 * cm])
@@ -203,7 +203,7 @@ story.append(tt)
 story.append(Spacer(1, 4))
 story.append(Paragraph(
     "<b>Arquitetura:</b> o navegador (React) chama a API em Python (FastAPI), que se conecta ao "
-    "MariaDB via PyMySQL e dispara as procedures/triggers do banco — exatamente o ciclo "
+    "PostgreSQL via psycopg2 e dispara as procedures/triggers do banco — exatamente o ciclo "
     "“aplicação → linguagem de programação → banco de dados” pedido no enunciado.", BODY))
 
 story.append(PageBreak())
@@ -247,10 +247,10 @@ story.append(PageBreak())
 story.append(Paragraph("8. Entrega da aplicação", H2))
 story.append(Paragraph(
     "<b>Código-fonte (repositório):</b> "
-    "<font color='#1d4ed8'>https://github.com/danielgidrao/sugu-financeiro-etapa3</font>", BODY))
+    "<font color='#1d4ed8'>https://github.com/HeitorPER/sugu-financeiro-etapa3</font>", BODY))
 story.append(Paragraph(
     "<b>Vídeo demonstrativo (3 min):</b> "
-    "<font color='#1d4ed8'>&lt;inserir link do vídeo&gt;</font>.", BODY))
+    "<a href='https://youtu.be/4JJCjEmTtUQ' color='#1d4ed8'>https://youtu.be/4JJCjEmTtUQ</a>.", BODY))
 story.append(Paragraph(
     "O repositório contém: <font name='Courier'>db/</font> (scripts SQL da Etapa 2 — schema, "
     "rotinas e carga), <font name='Courier'>backend/</font> (API FastAPI em Python) e "
@@ -260,24 +260,26 @@ story.append(Paragraph(
 # ---------------------------------- ITEM 9 -------------------------------
 story.append(Paragraph("9. Dificuldades enfrentadas e soluções", H2))
 difs = [
-    ("Procedure com parâmetro de saída (OUT)",
-     "A <font name='Courier'>sp_registrar_compra</font> retorna o id da compra por um parâmetro OUT, "
-     "que o PyMySQL não devolve diretamente. <b>Solução:</b> chamar "
-     "<font name='Courier'>CALL ...(@novo_id)</font> e, na mesma conexão, executar "
-     "<font name='Courier'>SELECT @novo_id</font>."),
-    ("Diretiva DELIMITER na carga do banco",
-     "O PyMySQL executa um comando por vez e não entende a diretiva DELIMITER usada para criar "
-     "triggers/procedures. <b>Solução:</b> carregar os scripts pelo cliente nativo "
-     "<font name='Courier'>mariadb</font> (no container), e usar o PyMySQL apenas para as operações da aplicação."),
+    ("Parâmetro INOUT em CALL via psycopg2",
+     "A <font name='Courier'>sp_registrar_compra</font> usa um parâmetro INOUT para retornar o id da compra. "
+     "O <font name='Courier'>callproc()</font> do psycopg2 não trata INOUT corretamente. "
+     "<b>Solução:</b> usar <font name='Courier'>cursor.execute(\"CALL ...\")</font> e recuperar o valor "
+     "com <font name='Courier'>fetchone()</font>."),
+    ("Dollar-quoting ($$) nas rotinas do banco",
+     "As functions e triggers do PostgreSQL usam <font name='Courier'>$$...$$</font> como delimitador de "
+     "corpo, incompatível com execução linha a linha via psycopg2. "
+     "<b>Solução:</b> carregar os scripts pelo cliente nativo "
+     "<font name='Courier'>psql</font>, usando psycopg2 apenas nas operações da aplicação."),
     ("Traduzir erros do banco para o usuário",
-     "Triggers (SIGNAL 45000), CHECK, UNIQUE e FK retornam erros técnicos. <b>Solução:</b> uma camada "
-     "de tratamento converte essas exceções em respostas HTTP 400 com a mensagem de negócio, exibida na tela."),
+     "Triggers (<font name='Courier'>RAISE EXCEPTION</font>), CHECK, UNIQUE e FK retornam erros técnicos. "
+     "<b>Solução:</b> uma camada de tratamento converte exceções do psycopg2 em respostas HTTP 400 "
+     "com a mensagem de negócio, exibida na tela."),
     ("CORS entre front-end e back-end",
      "React (porta 5173) e API (porta 8000) em origens diferentes. <b>Solução:</b> proxy "
      "<font name='Courier'>/api</font> no Vite e <font name='Courier'>CORSMiddleware</font> no FastAPI."),
-    ("Banco não instalado na máquina",
-     "Não havia MariaDB local. <b>Solução:</b> subir o MariaDB 10.11 em um container Docker e recarregar "
-     "os scripts da Etapa 2, preservando restrições, índices, functions, triggers e procedures."),
+    ("Configuração do PostgreSQL no ambiente local",
+     "Não havia PostgreSQL instalado localmente. <b>Solução:</b> subir o PostgreSQL 14+ em um container "
+     "Docker e recarregar os scripts da Etapa 2, preservando restrições, índices, functions, triggers e procedures."),
 ]
 story.append(ListFlowable(
     [ListItem(Paragraph(f"<b>{t}.</b> {d}", LI)) for t, d in difs],
@@ -290,27 +292,31 @@ story.append(Paragraph("10. Contribuição individual", H2))
 story.append(Paragraph(
     "Cada integrante foi responsável por uma funcionalidade de ponta a ponta — do banco de dados "
     "e do back-end (Python) até a respectiva tela no front-end (React) — dividindo o trabalho de "
-    "forma equilibrada (links dos vídeos individuais a inserir):", BODY))
+    "forma equilibrada:", BODY))
 contrib = [
     [PH("Integrante"), PH("RA"), PH("Tarefas realizadas (do banco ao front)")],
     [P("<b>Daniel Gidrão</b>"), P("829511"),
      P("<b>Relatórios e Painel.</b> No banco: consultas analíticas e a procedure "
        "<font name='Courier'>sp_relatorio_orcamento</font> (com a function "
        "<font name='Courier'>fn_saldo_orcamento</font>). No back-end: endpoints de relatórios e do "
-       "dashboard. No front: telas de <i>Relatórios</i> e <i>Painel Financeiro</i>.")],
+       "dashboard. No front: telas de <i>Relatórios</i> e <i>Painel Financeiro</i>. "
+       "<a href='https://youtu.be/gSnZIK8yMLI' color='#1d4ed8'>Vídeo individual</a>")],
     [P("<b>Gustavo Bragaia</b>"), P("834383"),
      P("<b>Fornecedores.</b> No banco: tabela FORNECEDOR e suas restrições (UNIQUE de CNPJ e CHECK "
        "de regularidade). No back-end: endpoints de cadastro e de atualização da regularidade fiscal. "
-       "No front: tela de <i>Fornecedores</i>.")],
+       "No front: tela de <i>Fornecedores</i>. "
+       "<a href='https://www.youtube.com/watch?v=3ZaZDzZozZY' color='#1d4ed8'>Vídeo individual</a>")],
     [P("<b>Heitor Giometti</b>"), P("834220"),
      P("<b>Compras.</b> No banco: procedure <font name='Courier'>sp_registrar_compra</font> e as "
        "triggers de compra/orçamento (regularidade, saldo e consumo). No back-end: endpoint de efetuar "
-       "compra. No front: tela <i>Efetuar Compra</i>, com a demonstração das regras de negócio.")],
+       "compra. No front: tela <i>Efetuar Compra</i>, com a demonstração das regras de negócio. "
+       "<a href='https://youtu.be/GSpGHL1-Tro' color='#1d4ed8'>Vídeo individual</a>")],
     [P("<b>Lucas Martinez</b>"), P("832627"),
      P("<b>Licitações, Propostas e Pagamentos.</b> No banco: procedures "
        "<font name='Courier'>sp_homologar_licitacao</font> e <font name='Courier'>sp_registrar_pagamento</font> "
        "e as triggers de proposta/pagamento. No back-end: endpoints correspondentes. No front: telas de "
-       "<i>Licitações</i> e <i>Pagamentos</i>.")],
+       "<i>Licitações</i> e <i>Pagamentos</i>. "
+       "<a href='https://youtu.be/0Zrr5_Hvuew' color='#1d4ed8'>Vídeo individual</a>")],
 ]
 ct = Table(contrib, colWidths=[3.2 * cm, 1.8 * cm, 11 * cm])
 ct.setStyle(TableStyle([
@@ -329,7 +335,7 @@ ct.setStyle(TableStyle([
 story.append(ct)
 story.append(Spacer(1, 6))
 story.append(Paragraph(
-    "<i>Base comum (provisão do MariaDB 10.11 em Docker, camada de acesso a dados em "
+    "<i>Base comum (provisão do PostgreSQL 14+ em Docker, camada de acesso a dados em "
     "<font name='Courier'>db.py</font>, padronização do tratamento de erros da API e a navegação/estilos "
     "do front-end) desenvolvida em conjunto pelos quatro integrantes.</i>", NOTE))
 
