@@ -45,6 +45,7 @@ export const api = {
 
   // Notas / Pagamentos
   notas: () => request("/notas"),
+  patrimonios: () => request("/patrimonios"),
   registrarPagamento: (body) =>
     request("/pagamentos", { method: "POST", body: JSON.stringify(body) }),
 

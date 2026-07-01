@@ -143,6 +143,28 @@ CREATE TRIGGER trg_pagamento_before_insert
 BEFORE INSERT ON PAGAMENTO FOR EACH ROW
 EXECUTE FUNCTION trgf_pagamento_before_insert();
 
+CREATE OR REPLACE FUNCTION trgf_patrimonio_data()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_data_compra DATE;
+BEGIN
+  SELECT data INTO v_data_compra
+    FROM COMPRA
+   WHERE id_compra = NEW.id_compra;
+
+  IF NEW.data_aquisicao < v_data_compra THEN
+    RAISE EXCEPTION 'Data de aquisicao (%) e anterior a data da compra (%).',
+      NEW.data_aquisicao, v_data_compra;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_patrimonio_data
+BEFORE INSERT ON PATRIMONIO FOR EACH ROW
+EXECUTE FUNCTION trgf_patrimonio_data();
+
 -- ============================ PROCEDURES =============================
 CREATE OR REPLACE PROCEDURE sp_registrar_compra(
   p_data DATE, p_valor NUMERIC(15,2), p_id_fornecedor INT,
@@ -169,7 +191,7 @@ BEGIN
   UPDATE LICITACAO SET status = 'HOMOLOGADA' WHERE id_licitacao = p_id_licitacao;
 END;
 $$;
-
+.
 CREATE OR REPLACE PROCEDURE sp_registrar_pagamento(
   p_id_nota INT, p_valor NUMERIC(15,2), p_forma VARCHAR(15), p_data DATE)
 LANGUAGE plpgsql AS $$

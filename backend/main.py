@@ -280,6 +280,24 @@ def listar_notas():
         return cur.fetchall()
 
 
+@app.get("/api/patrimonios")
+def listar_patrimonios():
+    """PATRIMONIO associado a COMPRA, FORNECEDOR e ORCAMENTO."""
+    with db_cursor() as cur:
+        cur.execute("""
+            SELECT p.id_patrimonio, p.descricao, p.localizacao, p.estado_conservacao,
+                   p.data_aquisicao, p.id_compra, c.data AS data_compra,
+                   c.valor_total AS valor_compra, f.nome AS fornecedor,
+                   o.setor AS orcamento_setor, o.projeto AS orcamento_projeto
+              FROM PATRIMONIO p
+              JOIN COMPRA c ON c.id_compra = p.id_compra
+              JOIN FORNECEDOR f ON f.id_fornecedor = c.id_fornecedor
+              JOIN ORCAMENTO o ON o.id_orcamento = c.id_orcamento
+             ORDER BY p.id_patrimonio DESC
+        """)
+        return cur.fetchall()
+
+
 @app.post("/api/pagamentos", status_code=201)
 def registrar_pagamento(p: PagamentoIn):
     """Chama sp_registrar_pagamento; trigger valida saldo da nota."""
