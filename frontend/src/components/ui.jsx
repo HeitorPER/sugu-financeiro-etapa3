@@ -17,6 +17,17 @@ export function StatusBadge({ value }) {
   return <Badge kind={LIC_KIND[value] || "gray"}>{value}</Badge>;
 }
 
+const PATR_KIND = {
+  NOVO: "green",
+  BOM: "blue",
+  REGULAR: "amber",
+  RUIM: "red",
+  INSERVIVEL: "gray",
+};
+export function EstadoPatrimonioBadge({ value }) {
+  return <Badge kind={PATR_KIND[value] || "gray"}>{value}</Badge>;
+}
+
 export function Alert({ type, children, onClose }) {
   if (!children) return null;
   return (
