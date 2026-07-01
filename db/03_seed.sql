@@ -38,19 +38,19 @@ INSERT INTO FORNECEDOR (id_fornecedor, nome, cnpj, endereco, telefone, regularid
 (14,'Materiais Diversos SA' ,'15.151.515/0001-15','Av. Atrasada, 1'      ,'(11) 2002-0202','IRREGULAR'),
 (15,'Servicos Gerais ME'    ,'16.161.616/0001-16','Rua Pendencia, 7'     ,'(11) 2003-0303','IRREGULAR');
 
-INSERT INTO LICITACAO (id_licitacao, tipo, data_inicio, data_fim, status) VALUES
-(1 ,'PREGAO'      ,'2024-01-10','2024-02-10','ABERTA'),
-(2 ,'CONCORRENCIA','2024-02-01','2024-03-15','ABERTA'),
-(3 ,'PREGAO'      ,'2024-02-20','2024-03-20','ABERTA'),
-(4 ,'CONVITE'     ,'2024-03-05','2024-03-25','ABERTA'),
-(5 ,'CONCORRENCIA','2025-01-15','2025-03-01','ABERTA'),
-(6 ,'PREGAO'      ,'2025-02-10','2025-03-10','ABERTA'),
-(7 ,'TOMADA_PRECO','2025-02-15','2025-03-20','ABERTA'),
-(8 ,'PREGAO'      ,'2025-03-01','2025-04-01','ABERTA'),
-(9 ,'CONVITE'     ,'2025-03-10','2025-03-30','ABERTA'),
-(10,'CONCORRENCIA','2025-03-20','2025-05-10','ABERTA'),
-(11,'PREGAO'      ,'2025-04-01','2025-04-30','ABERTA'),
-(12,'DISPENSA'    ,'2025-04-05','2025-04-15','ABERTA');
+INSERT INTO LICITACAO (id_licitacao, tipo, nome, data_inicio, data_fim, status) VALUES
+(1 ,'PREGAO'      ,'Aquisicao de servidores de rack'          ,'2024-01-10','2024-02-10','ABERTA'),
+(2 ,'CONCORRENCIA','Fornecimento de material de escritorio'   ,'2024-02-01','2024-03-15','ABERTA'),
+(3 ,'PREGAO'      ,'Aquisicao de estantes para acervo'        ,'2024-02-20','2024-03-20','ABERTA'),
+(4 ,'CONVITE'     ,'Servicos de climatizacao'                 ,'2024-03-05','2024-03-25','ABERTA'),
+(5 ,'CONCORRENCIA','Reforma de laboratorio de pesquisa'       ,'2025-01-15','2025-03-01','ABERTA'),
+(6 ,'PREGAO'      ,'Aquisicao de equipamentos de informatica' ,'2025-02-10','2025-03-10','ABERTA'),
+(7 ,'TOMADA_PRECO','Obra de estrutura metalica'               ,'2025-02-15','2025-03-20','ABERTA'),
+(8 ,'PREGAO'      ,'Aquisicao de licencas de software'        ,'2025-03-01','2025-04-01','ABERTA'),
+(9 ,'CONVITE'     ,'Servicos de manutencao predial'           ,'2025-03-10','2025-03-30','ABERTA'),
+(10,'CONCORRENCIA','Infraestrutura de data center'            ,'2025-03-20','2025-05-10','ABERTA'),
+(11,'PREGAO'      ,'Aquisicao de mobiliario corporativo'      ,'2025-04-01','2025-04-30','ABERTA'),
+(12,'DISPENSA'    ,'Contratacao emergencial de suprimentos'   ,'2025-04-05','2025-04-15','ABERTA');
 
 INSERT INTO PROPOSTA (id_proposta, valor, data, id_fornecedor, id_licitacao) VALUES
 (1 , 48000.00,'2024-01-15', 1, 1),
