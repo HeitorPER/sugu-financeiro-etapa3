@@ -68,6 +68,13 @@ class CompraIn(BaseModel):
     id_licitacao: Optional[int] = None
 
 
+class LicitacaoIn(BaseModel):
+    tipo: str = Field(..., max_length=20)
+    nome: str = Field(..., max_length=120)
+    data_inicio: date
+    data_fim: Optional[date] = None
+
+
 class PropostaIn(BaseModel):
     valor: Decimal
     data: date
@@ -208,11 +215,27 @@ def listar_licitacoes():
     """LICITACAO com numero de propostas pela function fn_qtd_propostas."""
     with db_cursor() as cur:
         cur.execute("""
-            SELECT id_licitacao, tipo, data_inicio, data_fim, status,
+            SELECT id_licitacao, tipo, nome, data_inicio, data_fim, status,
                    fn_qtd_propostas(id_licitacao) AS qtd_propostas
               FROM LICITACAO ORDER BY id_licitacao
         """)
         return cur.fetchall()
+
+
+@app.post("/api/licitacoes", status_code=201)
+def criar_licitacao(l: LicitacaoIn):
+    """Insere LICITACAO; status inicial ABERTA (default do schema)."""
+    try:
+        with db_cursor(commit=True) as cur:
+            cur.execute("""
+                INSERT INTO LICITACAO (tipo, nome, data_inicio, data_fim)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id_licitacao
+            """, (l.tipo, l.nome, l.data_inicio, l.data_fim))
+            new_id = cur.fetchone()["id_licitacao"]
+        return {"id_licitacao": new_id, "mensagem": "Licitacao criada com sucesso."}
+    except Exception as exc:
+        raise db_error_to_http(exc)
 
 
 @app.get("/api/licitacoes/{id_licitacao}/propostas")

@@ -34,6 +34,8 @@ export const api = {
 
   // Licitacoes / Propostas
   licitacoes: () => request("/licitacoes"),
+  criarLicitacao: (body) =>
+    request("/licitacoes", { method: "POST", body: JSON.stringify(body) }),
   propostas: (idLic) => request(`/licitacoes/${idLic}/propostas`),
   criarProposta: (body) =>
     request("/propostas", { method: "POST", body: JSON.stringify(body) }),

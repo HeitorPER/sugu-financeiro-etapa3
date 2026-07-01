@@ -12,6 +12,11 @@ export default function Licitacoes() {
   const [form, setForm] = useState({ valor: "", data: hoje, id_fornecedor: "" });
   const [msg, setMsg] = useState(null);
   const [err, setErr] = useState(null);
+  const [formLic, setFormLic] = useState({ tipo: "PREGAO", nome: "", data_inicio: hoje, data_fim: "" });
+  const [msgLic, setMsgLic] = useState(null);
+  const [errLic, setErrLic] = useState(null);
+
+  const TIPOS = ["PREGAO", "CONCORRENCIA", "TOMADA_PRECO", "CONVITE", "DISPENSA"];
 
   const carregarLic = () => api.licitacoes().then(setLicitacoes);
   useEffect(() => {
@@ -31,6 +36,22 @@ export default function Licitacoes() {
       setSel(atual);
       setPropostas(await api.propostas(sel.id_licitacao));
     }
+  };
+
+  const criarLicitacao = async (e) => {
+    e.preventDefault();
+    setMsgLic(null); setErrLic(null);
+    try {
+      const r = await api.criarLicitacao({
+        tipo: formLic.tipo,
+        nome: formLic.nome,
+        data_inicio: formLic.data_inicio,
+        data_fim: formLic.data_fim || null,
+      });
+      setMsgLic(r.mensagem);
+      setFormLic({ tipo: "PREGAO", nome: "", data_inicio: hoje, data_fim: "" });
+      carregarLic();
+    } catch (ex) { setErrLic(ex.message); }
   };
 
   const enviarProposta = async (e) => {
@@ -65,30 +86,70 @@ export default function Licitacoes() {
         subtitle="Gerencia propostas (PROPOSTA + FORNECEDOR) e homologa a licitacao (LICITACAO) via procedure sp_homologar_licitacao."
       />
       <div className="row-split">
-        <Card title="Licitacoes">
-          <table>
-            <thead>
-              <tr><th>#</th><th>Tipo</th><th>Status</th><th className="num">Propostas</th><th></th></tr>
-            </thead>
-            <tbody>
-              {licitacoes.map((l) => (
-                <tr key={l.id_licitacao} style={{ background: sel?.id_licitacao === l.id_licitacao ? "#eff6ff" : "" }}>
-                  <td className="muted">{l.id_licitacao}</td>
-                  <td>{l.tipo}</td>
-                  <td><StatusBadge value={l.status} /></td>
-                  <td className="num">{l.qtd_propostas}</td>
-                  <td><button className="btn ghost sm" onClick={() => abrir(l)}>Abrir</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <div>
+          <Card title="Licitacoes">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Nome</th><th>Tipo</th><th>Status</th><th className="num">Propostas</th><th></th></tr>
+              </thead>
+              <tbody>
+                {licitacoes.map((l) => (
+                  <tr key={l.id_licitacao} style={{ background: sel?.id_licitacao === l.id_licitacao ? "#eff6ff" : "" }}>
+                    <td className="muted">{l.id_licitacao}</td>
+                    <td>{l.nome}</td>
+                    <td>{l.tipo}</td>
+                    <td><StatusBadge value={l.status} /></td>
+                    <td className="num">{l.qtd_propostas}</td>
+                    <td><button className="btn ghost sm" onClick={() => abrir(l)}>Abrir</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+
+          <div style={{ height: 16 }} />
+
+          <Card title="Nova licitacao">
+            <Alert type="ok" onClose={() => setMsgLic(null)}>{msgLic}</Alert>
+            <Alert type="err" onClose={() => setErrLic(null)}>{errLic}</Alert>
+            <form onSubmit={criarLicitacao}>
+              <div className="form-grid">
+                <div className="field" style={{ gridColumn: "1 / -1" }}>
+                  <label>Nome</label>
+                  <input type="text" maxLength={120} placeholder="Ex.: Aquisicao de servidores"
+                         value={formLic.nome}
+                         onChange={(e) => setFormLic({ ...formLic, nome: e.target.value })} required />
+                </div>
+                <div className="field">
+                  <label>Tipo</label>
+                  <select value={formLic.tipo}
+                          onChange={(e) => setFormLic({ ...formLic, tipo: e.target.value })} required>
+                    {TIPOS.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Data de inicio</label>
+                  <input type="date" value={formLic.data_inicio}
+                         onChange={(e) => setFormLic({ ...formLic, data_inicio: e.target.value })} required />
+                </div>
+                <div className="field">
+                  <label>Data de fim (opcional)</label>
+                  <input type="date" value={formLic.data_fim}
+                         onChange={(e) => setFormLic({ ...formLic, data_fim: e.target.value })} />
+                </div>
+              </div>
+              <div className="form-actions">
+                <button className="btn" type="submit">Abrir licitacao</button>
+              </div>
+            </form>
+          </Card>
+        </div>
 
         <div>
           {!sel ? (
             <Card title="Detalhes"><p className="muted">Selecione uma licitacao para ver as propostas.</p></Card>
           ) : (
-            <Card title={`Licitacao #${sel.id_licitacao} — ${sel.tipo}`} action={<StatusBadge value={sel.status} />}>
+            <Card title={`#${sel.id_licitacao} — ${sel.nome} (${sel.tipo})`} action={<StatusBadge value={sel.status} />}>
               <Alert type="ok" onClose={() => setMsg(null)}>{msg}</Alert>
               <Alert type="err" onClose={() => setErr(null)}>{err}</Alert>
 
