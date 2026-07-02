@@ -43,6 +43,7 @@ CREATE TABLE FORNECEDOR (
 CREATE TABLE LICITACAO (
   id_licitacao SERIAL PRIMARY KEY,
   tipo         VARCHAR(20) NOT NULL,
+  nome         VARCHAR(120) NOT NULL,
   data_inicio  DATE NOT NULL,
   data_fim     DATE,
   status       VARCHAR(15) NOT NULL DEFAULT 'ABERTA',

@@ -4,6 +4,7 @@ import Fornecedores from "./pages/Fornecedores.jsx";
 import Compras from "./pages/Compras.jsx";
 import Licitacoes from "./pages/Licitacoes.jsx";
 import Pagamentos from "./pages/Pagamentos.jsx";
+import Patrimonio from "./pages/Patrimonio.jsx";
 import Relatorios from "./pages/Relatorios.jsx";
 
 const MENU = [
@@ -12,6 +13,7 @@ const MENU = [
   { id: "compras", label: "Efetuar Compra", ico: "🛒", comp: Compras },
   { id: "licitacoes", label: "Licitacoes", ico: "📑", comp: Licitacoes },
   { id: "pagamentos", label: "Pagamentos", ico: "💳", comp: Pagamentos },
+  { id: "patrimonio", label: "Patrimonio", ico: "🧾", comp: Patrimonio },
   { id: "relatorios", label: "Relatorios", ico: "📈", comp: Relatorios },
 ];
 
@@ -37,7 +39,9 @@ export default function App() {
           </button>
         ))}
         <div className="foot">
-          Etapa 3 · Acesso via aplicacao<br />Grupo Financeiro e Compras
+          Etapa 3 · Acesso via aplicacao
+          <br />
+          Grupo Financeiro e Compras
         </div>
       </aside>
       <main className="main">

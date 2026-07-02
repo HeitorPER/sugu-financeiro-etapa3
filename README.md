@@ -33,29 +33,26 @@ docs/      PDF de entrega, prints e scripts de geração
 
 ## Como executar
 
-### 1. Banco de dados (PostgreSQL 14+ via Docker)
+### 1. Banco de dados (PostgreSQL 14+ local, sem Docker)
 
 ```bash
-docker run -d --name sugu-postgres \
-  -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16
-
-# carregar os scripts (na ordem); o 01 recria a base sugu_financeiro:
-docker exec -i sugu-postgres psql -U postgres < db/01_schema.sql
-docker exec -i sugu-postgres psql -U postgres < db/02_routines.sql
-docker exec -i sugu-postgres psql -U postgres < db/03_seed.sql
+psql -U postgres -d postgres -f db/01_schema.sql
+psql -U postgres -d postgres -f db/02_routines.sql
+psql -U postgres -d postgres -f db/03_seed.sql
 ```
 
-> Já existe um PostgreSQL local? Basta carregar os três scripts com o cliente
-> `psql` (eles usam o meta-comando `\connect` para entrar na base recém-criada):
->
-> ```bash
-> psql -U postgres -f db/01_schema.sql
-> psql -U postgres -f db/02_routines.sql
-> psql -U postgres -f db/03_seed.sql
-> ```
->
-> As credenciais padrão são `postgres`/`postgres` em `localhost:5432` — ajuste em
-> `backend/.env` se necessário (veja `backend/.env.example`).
+No Windows, se o `psql` nao estiver no `PATH`, use o executavel completo:
+
+```powershell
+$env:PGPASSWORD='SUA_SENHA'
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -U postgres -d postgres -f 'db/01_schema.sql'
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -U postgres -d postgres -f 'db/02_routines.sql'
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -U postgres -d postgres -f 'db/03_seed.sql'
+```
+
+As credenciais padrao do projeto sao `postgres`/`postgres` em `localhost:5432`.
+Ajuste em `backend/.env` se a sua instalacao local usar outra senha (veja
+`backend/.env.example`).
 
 ### 2. Back-end (API Python)
 
@@ -78,4 +75,4 @@ npm run dev
 ## Tecnologias
 
 Python 3.13 · FastAPI · Uvicorn · psycopg2 · python-dotenv · React 18 · Vite ·
-PostgreSQL 14+ · Docker.
+PostgreSQL 14+.

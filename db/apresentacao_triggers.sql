@@ -56,13 +56,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_licitacao_status_imutavel ON LICITACAO;
 CREATE TRIGGER trg_licitacao_status_imutavel
 BEFORE UPDATE ON LICITACAO FOR EACH ROW
 EXECUTE FUNCTION trgf_licitacao_status_imutavel();
 
--- TESTE A2 (descomente para demonstrar):
--- CALL sp_homologar_licitacao(1, 1);                                 -- PASSA: status vira HOMOLOGADA
--- UPDATE LICITACAO SET status = 'ABERTA' WHERE id_licitacao = 1;     -- FALHA: nao pode reverter
+-- Bloco de teste (descomente para demonstrar):
+-- CALL sp_homologar_licitacao(1, 1);                              -- PASSA
+-- SELECT id_licitacao, status FROM LICITACAO WHERE id_licitacao = 1;
+-- --> 1 | HOMOLOGADA
+-- UPDATE LICITACAO SET status = 'ABERTA' WHERE id_licitacao = 1;  -- FALHA
+-- --> ERROR:  Licitacao 1 ja homologada: status nao pode ser revertido.
 
 
 -- =====================================================================
@@ -116,3 +120,4 @@ EXECUTE FUNCTION trgf_fornecedor_normaliza();
 -- INSERT INTO FORNECEDOR (nome, cnpj, regularidade_fiscal)
 --   VALUES ('   Inovacoes Demo LTDA   ', '20.202.020/0001-20', 'regular')
 --   RETURNING id_fornecedor, '['||nome||']' AS nome, regularidade_fiscal;  -- grava 'Inovacoes Demo LTDA' / 'REGULAR'
+

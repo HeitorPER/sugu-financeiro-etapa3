@@ -34,6 +34,8 @@ export const api = {
 
   // Licitacoes / Propostas
   licitacoes: () => request("/licitacoes"),
+  criarLicitacao: (body) =>
+    request("/licitacoes", { method: "POST", body: JSON.stringify(body) }),
   propostas: (idLic) => request(`/licitacoes/${idLic}/propostas`),
   criarProposta: (body) =>
     request("/propostas", { method: "POST", body: JSON.stringify(body) }),
@@ -45,6 +47,7 @@ export const api = {
 
   // Notas / Pagamentos
   notas: () => request("/notas"),
+  patrimonios: () => request("/patrimonios"),
   registrarPagamento: (body) =>
     request("/pagamentos", { method: "POST", body: JSON.stringify(body) }),
 
