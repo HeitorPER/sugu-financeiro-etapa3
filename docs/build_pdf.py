@@ -305,7 +305,7 @@ contrib = [
      P("<b>Fornecedores.</b> No banco: tabela FORNECEDOR e suas restrições (UNIQUE de CNPJ e CHECK "
        "de regularidade). No back-end: endpoints de cadastro e de atualização da regularidade fiscal. "
        "No front: tela de <i>Fornecedores</i>. "
-       "<a href='https://www.youtube.com/watch?v=3ZaZDzZozZY' color='#1d4ed8'>Vídeo individual</a>")],
+       "<a href='https://youtu.be/yyVclAPHOw4' color='#1d4ed8'>Vídeo individual</a>")],
     [P("<b>Heitor Giometti</b>"), P("834220"),
      P("<b>Compras.</b> No banco: procedure <font name='Courier'>sp_registrar_compra</font> e as "
        "triggers de compra/orçamento (regularidade, saldo e consumo). No back-end: endpoint de efetuar "
