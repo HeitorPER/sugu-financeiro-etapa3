@@ -191,7 +191,7 @@ BEGIN
   UPDATE LICITACAO SET status = 'HOMOLOGADA' WHERE id_licitacao = p_id_licitacao;
 END;
 $$;
-.
+
 CREATE OR REPLACE PROCEDURE sp_registrar_pagamento(
   p_id_nota INT, p_valor NUMERIC(15,2), p_forma VARCHAR(15), p_data DATE)
 LANGUAGE plpgsql AS $$
